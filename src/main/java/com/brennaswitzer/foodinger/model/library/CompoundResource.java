@@ -2,8 +2,8 @@ package com.brennaswitzer.foodinger.model.library;
 
 import java.util.List;
 
-public interface CompoundResource<E extends ResourceComponent> extends Resource {
+public interface CompoundResource extends Resource {
 
-    List<E> getComponents();
+    List<? extends ResourceComponent> getComponents();
 
 }

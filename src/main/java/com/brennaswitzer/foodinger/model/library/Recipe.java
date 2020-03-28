@@ -14,7 +14,7 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Recipe implements CompoundResource<RecipeItem>, Owned, Labeled {
+public class Recipe implements CompoundResource, Owned, Labeled {
 
     private User owner;
     private String name;
@@ -36,9 +36,7 @@ public class Recipe implements CompoundResource<RecipeItem>, Owned, Labeled {
 
     @Override
     public void addLabel(Label label) {
-        if (labels == null) {
-            labels = new HashSet<>();
-        }
+        if (labels == null) labels = new HashSet<>();
         labels.add(label);
     }
 

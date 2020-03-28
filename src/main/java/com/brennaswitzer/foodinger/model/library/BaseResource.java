@@ -1,16 +1,18 @@
 package com.brennaswitzer.foodinger.model.library;
 
 import lombok.Data;
+import lombok.NonNull;
 
 @Data
-public class PurchasedResource implements Resource {
+public class BaseResource implements Resource {
 
+    @NonNull
     private String name;
     private boolean deleted;
 
-    public PurchasedResource() {}
+    public BaseResource() {}
 
-    public PurchasedResource(String name) {
+    public BaseResource(String name) {
         this.name = name;
     }
 

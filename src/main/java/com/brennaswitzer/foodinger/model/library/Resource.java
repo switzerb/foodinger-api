@@ -4,4 +4,8 @@ public interface Resource {
 
     String getName();
 
+    default boolean isCompound() {
+        return this instanceof CompoundResource;
+    }
+
 }

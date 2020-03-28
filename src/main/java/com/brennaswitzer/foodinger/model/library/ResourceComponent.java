@@ -6,5 +6,5 @@ public interface ResourceComponent {
     String getRaw();
     Quantity getQuantity();
     Resource getResource();
-    String getPreparation();
+    String getNotes();
 }

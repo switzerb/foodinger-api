@@ -1,4 +1,4 @@
-package com.brennaswitzer.foodinger.model.e2e;
+package com.brennaswitzer.foodinger.model.flow;
 
 import com.brennaswitzer.foodinger.model.Label;
 import com.brennaswitzer.foodinger.model.library.Recipe;
@@ -33,7 +33,7 @@ public class Library {
                         .raw("1 & 1/2 cup shredded mozzarella cheese")
                         .quantity(Quantity.of(1.5, Unit.of("cup")))
                         .resource(Grocery.MOZZARELLA)
-                        .preparation("shredded")
+                        .notes("shredded")
                         .build())
                 .item(RecipeItem.builder()
                         .raw("3 oz pepperoni")
