@@ -7,4 +7,5 @@ public interface ResourceComponent {
     Quantity getQuantity();
     Resource getResource();
     String getNotes();
+    String toLabel();
 }

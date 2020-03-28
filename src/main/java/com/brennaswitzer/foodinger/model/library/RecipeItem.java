@@ -20,4 +20,19 @@ public class RecipeItem implements ResourceComponent {
         return resource instanceof CompoundResource;
     }
 
+    public String toLabel() {
+        if (resource == null) return raw;
+        val sb = new StringBuilder();
+        if (quantity.isExplicit()) {
+            sb.append(quantity)
+                    .append(' ');
+        }
+        sb.append(resource.getName());
+        if (notes != null && !notes.isEmpty()) {
+            sb.append(", ")
+                    .append(notes);
+        }
+        return sb.toString();
+    }
+
 }

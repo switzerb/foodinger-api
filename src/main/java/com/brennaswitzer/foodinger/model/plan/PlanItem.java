@@ -50,16 +50,27 @@ public class PlanItem {
         if (sourceResourceComponent.getResource().isCompound()) {
             return ItemType.RECIPE;
         }
-        return ItemType.SIMPLE_RESOURCE;
+        return ItemType.BASE_RESOURCE;
     }
 
     public void addChild(PlanItem it) {
+        if (it.parent != null) {
+            it.parent.removeChild(it);
+        }
         if (children == null) children = new ArrayList<>();
         children.add(it);
         it.parent = this;
     }
 
+    public void removeChild(PlanItem it) {
+        if (children.remove(it)) return;
+        throw new IllegalArgumentException("The passed item is not a child of this item");
+    }
+
     public void addComponent(PlanItem it) {
+        if (it.componentOf != null) {
+            throw new UnsupportedOperationException("The plan component hierarchy is immutable");
+        }
         if (components == null) components = new ArrayList<>();
         components.add(it);
         it.componentOf = this;
@@ -97,7 +108,7 @@ public class PlanItem {
         if (sourceResourceComponent == null) {
             return name;
         }
-        return sourceResourceComponent.toString();
+        return sourceResourceComponent.toLabel();
     }
 
 }
