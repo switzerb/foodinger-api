@@ -1,5 +1,6 @@
 package com.brennaswitzer.foodinger.model.flow;
 
+import com.brennaswitzer.foodinger.model.measure.Quantity;
 import com.brennaswitzer.foodinger.model.plan.Plan;
 import com.brennaswitzer.foodinger.model.plan.PlanItem;
 import lombok.val;
@@ -14,7 +15,7 @@ public class PlanFlowTests {
         p.addChild(sat);
         val sun = new PlanItem("Sunday");
         p.addChild(sun);
-        sun.addChild(Library.PIZZA);
+        sun.addChild(Quantity.of(3, null), Library.PIZZA);
         val crust = findChildNamed(sun, "Pizza Crust");
         assert crust != null;
         sat.addChild(crust);

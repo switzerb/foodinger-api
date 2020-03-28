@@ -30,11 +30,6 @@ public class Recipe implements CompoundResource, Owned, Labeled {
     public Recipe() {}
 
     @Override
-    public List<RecipeItem> getComponents() {
-        return getItems();
-    }
-
-    @Override
     public void addLabel(Label label) {
         if (labels == null) labels = new HashSet<>();
         labels.add(label);

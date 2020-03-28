@@ -3,7 +3,7 @@ package com.brennaswitzer.foodinger.model.plan;
 import com.brennaswitzer.foodinger.model.library.CompoundResource;
 import com.brennaswitzer.foodinger.model.library.RecipeItem;
 import com.brennaswitzer.foodinger.model.library.Resource;
-import com.brennaswitzer.foodinger.model.library.ResourceComponent;
+import com.brennaswitzer.foodinger.model.library.ResourceItem;
 import com.brennaswitzer.foodinger.model.measure.Quantity;
 import lombok.*;
 
@@ -34,7 +34,7 @@ public class PlanItem {
     @Singular private List<PlanItem> components;
     private PlanItem componentOf;
 
-    private ResourceComponent sourceResourceComponent;
+    private ResourceItem sourceResourceItem;
     private boolean split;
 
     public PlanItem() {}
@@ -44,13 +44,18 @@ public class PlanItem {
     }
 
     public ItemType getType() {
-        if (sourceResourceComponent == null) {
+        if (sourceResourceItem == null) {
             return ItemType.SECTION;
         }
-        if (sourceResourceComponent.getResource().isCompound()) {
+        val res = sourceResourceItem.getResource();
+        if (res == null) {
+            // don't have enough info
+            return ItemType.GROCERY;
+        }
+        if (res.isCompound()) {
             return ItemType.RECIPE;
         }
-        return ItemType.BASE_RESOURCE;
+        return ItemType.GROCERY;
     }
 
     public void addChild(PlanItem it) {
@@ -88,13 +93,13 @@ public class PlanItem {
                 .build());
     }
 
-    protected PlanItem addChild(ResourceComponent rc) {
+    protected PlanItem addChild(ResourceItem rc) {
         val r = rc.getResource();
         val pi = new PlanItem(r.getName());
-        pi.setSourceResourceComponent(rc);
+        pi.setSourceResourceItem(rc);
         addChild(pi);
         if (r.isCompound()) {
-            ((CompoundResource) r).getComponents().forEach(c ->
+            ((CompoundResource) r).getItems().forEach(c ->
                     pi.addComponent(pi.addChild(c)));
         }
         return pi;
@@ -105,10 +110,10 @@ public class PlanItem {
     }
 
     public String toLabel() {
-        if (sourceResourceComponent == null) {
+        if (sourceResourceItem == null) {
             return name;
         }
-        return sourceResourceComponent.toLabel();
+        return sourceResourceItem.toLabel();
     }
 
 }

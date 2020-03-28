@@ -6,7 +6,7 @@ import lombok.*;
 @Data
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class RecipeItem implements ResourceComponent {
+public class RecipeItem implements ResourceItem {
 
     @NonNull
     private String raw;

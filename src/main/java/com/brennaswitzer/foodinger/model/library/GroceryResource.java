@@ -4,15 +4,15 @@ import lombok.Data;
 import lombok.NonNull;
 
 @Data
-public class BaseResource implements Resource {
+public class GroceryResource implements Resource {
 
     @NonNull
     private String name;
     private boolean deleted;
 
-    public BaseResource() {}
+    public GroceryResource() {}
 
-    public BaseResource(String name) {
+    public GroceryResource(String name) {
         this.name = name;
     }
 

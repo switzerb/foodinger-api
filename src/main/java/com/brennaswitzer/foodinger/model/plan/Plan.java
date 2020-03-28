@@ -19,4 +19,8 @@ public class Plan extends PlanItem implements AccessControlled {
         super(name);
     }
 
+    @Override
+    public ItemType getType() {
+        return ItemType.PLAN;
+    }
 }
