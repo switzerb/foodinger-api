@@ -1,8 +1,10 @@
 package com.brennaswitzer.foodinger.model.task;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString(exclude = {"list"})
 public class Task {
 
     private String name;

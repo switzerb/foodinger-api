@@ -1,19 +1,20 @@
 package com.brennaswitzer.foodinger.model.flow;
 
-import com.brennaswitzer.foodinger.model.library.GroceryResource;
+import com.brennaswitzer.foodinger.model.library.Ingredient;
 
 public class Grocery {
 
-    public static final GroceryResource MOZZARELLA = new GroceryResource("mozzarella");
-    public static final GroceryResource PEPPERONI = new GroceryResource("pepperoni");
-    public static final GroceryResource TOMATOES = new GroceryResource("tomatoes");
-    public static final GroceryResource BASIL = new GroceryResource("basil");
-    public static final GroceryResource FLOUR = new GroceryResource("flour");
-    public static final GroceryResource WATER = new GroceryResource("water");
-    public static final GroceryResource SUGAR = new GroceryResource("sugar");
-    public static final GroceryResource YEAST = new GroceryResource("yeast");
+    public static final Ingredient MOZZARELLA = new Ingredient("mozzarella");
+    public static final Ingredient PEPPERONI = new Ingredient("pepperoni");
+    public static final Ingredient TOMATOES = new Ingredient("tomatoes");
+    public static final Ingredient BASIL = new Ingredient("basil");
+    public static final Ingredient FLOUR = new Ingredient("flour");
+    public static final Ingredient WATER = new Ingredient("water");
+    public static final Ingredient SUGAR = new Ingredient("sugar");
+    public static final Ingredient YEAST = new Ingredient("yeast");
 
-    public static final GroceryResource SPAG_SAUCE = new GroceryResource("spag. sauce");
-    public static final GroceryResource PIZZA_DOUGH = new GroceryResource("pizza dough");
+    public static final Ingredient SPAG_SAUCE = new Ingredient("spag. sauce");
+    public static final Ingredient PIZZA_DOUGH = new Ingredient("pizza dough");
+    public static final Ingredient WINE = new Ingredient("wine");
 
 }

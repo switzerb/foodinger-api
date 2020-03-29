@@ -1,9 +1,8 @@
 package com.brennaswitzer.foodinger.model.plan;
 
-import com.brennaswitzer.foodinger.model.library.CompoundResource;
+import com.brennaswitzer.foodinger.model.Item;
+import com.brennaswitzer.foodinger.model.library.Ingredient;
 import com.brennaswitzer.foodinger.model.library.RecipeItem;
-import com.brennaswitzer.foodinger.model.library.Resource;
-import com.brennaswitzer.foodinger.model.library.ResourceItem;
 import com.brennaswitzer.foodinger.model.measure.Quantity;
 import lombok.*;
 
@@ -12,15 +11,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Builder
 @ToString(exclude = {"parent", "componentOf"})
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class PlanItem {
+public class PlanItem implements Item {
+
+    public static PlanItem section(String name) {
+        return new PlanItem(name, ItemType.SECTION);
+    }
+
+    public static PlanItem adhoc(String name) {
+        return new PlanItem(name, ItemType.AD_HOC);
+    }
 
     @NonNull
-    private String name;
+    private String raw;
+    private Quantity quantity;
+    private Ingredient ingredient;
+    private String notes;
     private boolean deleted;
-    private ItemStatus status;
+    @NonNull
+    private ItemType type;
+    private ItemStatus status = ItemStatus.NEEDED;
     private Instant dueAt;
 
     // plan hierarchy - on delete of parent, children become peers of their aunts and uncles
@@ -34,28 +45,24 @@ public class PlanItem {
     @Singular private List<PlanItem> components;
     private PlanItem componentOf;
 
-    private ResourceItem sourceResourceItem;
+    private Item sourceItem;
     private boolean split;
 
-    public PlanItem() {}
-
-    public PlanItem(String name) {
-        this.name = name;
+    protected PlanItem(String raw, ItemType type) {
+        this.raw = raw;
+        this.type = type;
     }
 
-    public ItemType getType() {
-        if (sourceResourceItem == null) {
-            return ItemType.SECTION;
-        }
-        val res = sourceResourceItem.getResource();
-        if (res == null) {
-            // don't have enough info
-            return ItemType.GROCERY;
-        }
-        if (res.isCompound()) {
-            return ItemType.RECIPE;
-        }
-        return ItemType.GROCERY;
+    public PlanItem(Item i) {
+        this.raw = i.getRaw();
+        this.sourceItem = i;
+        // these might just copy over a null, but that's fine.
+        this.quantity = i.getQuantity();
+        this.ingredient = i.getIngredient();
+        this.notes = i.getNotes();
+        this.type = this.ingredient != null && this.ingredient.isRecipe()
+            ? ItemType.TO_MAKE
+            : ItemType.TO_BUY;
     }
 
     public void addChild(PlanItem it) {
@@ -65,6 +72,8 @@ public class PlanItem {
         if (children == null) children = new ArrayList<>();
         children.add(it);
         it.parent = this;
+
+        // todo: should this make the child a component, if it's not already a component of something else?
     }
 
     public void removeChild(PlanItem it) {
@@ -81,39 +90,33 @@ public class PlanItem {
         it.componentOf = this;
     }
 
-    public void addChild(Resource r) {
-        addChild(Quantity.ONE, r);
+    public void addChild(Ingredient ing) {
+        addChild(Quantity.ONE, ing);
     }
 
-    public void addChild(Quantity q, Resource r) {
+    public void addChild(Quantity q, Ingredient r) {
         addChild(RecipeItem.builder()
-                .raw(q.toString() + " " + r.getName())
+                .raw(q.isExplicit()
+                        ? q.toString() + " " + r.getName()
+                        : r.getName())
                 .quantity(q)
-                .resource(r)
+                .ingredient(r)
                 .build());
     }
 
-    protected PlanItem addChild(ResourceItem rc) {
-        val r = rc.getResource();
-        val pi = new PlanItem(r.getName());
-        pi.setSourceResourceItem(rc);
-        addChild(pi);
-        if (r.isCompound()) {
-            ((CompoundResource) r).getItems().forEach(c ->
+    protected PlanItem addChild(Item ri) {
+        val pi = new PlanItem(ri);
+        val ing = ri.getIngredient();
+        if (ing.isRecipe()) {
+            ing.getItems().forEach(c ->
                     pi.addComponent(pi.addChild(c)));
         }
+        addChild(pi);
         return pi;
     }
 
     public boolean hasChildren() {
         return children != null && !children.isEmpty();
-    }
-
-    public String toLabel() {
-        if (sourceResourceItem == null) {
-            return name;
-        }
-        return sourceResourceItem.toLabel();
     }
 
 }

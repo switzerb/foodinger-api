@@ -14,11 +14,13 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Recipe implements CompoundResource, Owned, Labeled {
+public class Ingredient implements Owned, Labeled {
 
     private User owner;
     private String name;
     private boolean deleted;
+
+    private boolean recipe;
     private String imagePath;
     private String externalUrl;
     @Singular private Set<Label> labels;
@@ -27,7 +29,11 @@ public class Recipe implements CompoundResource, Owned, Labeled {
     @Singular private List<RecipeItem> items;
     private String directions;
 
-    public Recipe() {}
+    public Ingredient() {}
+
+    public Ingredient(String name) {
+        this.name = name;
+    }
 
     @Override
     public void addLabel(Label label) {

@@ -1,6 +1,7 @@
 package com.brennaswitzer.foodinger.model.flow;
 
 import com.brennaswitzer.foodinger.model.measure.Quantity;
+import com.brennaswitzer.foodinger.model.measure.Unit;
 import com.brennaswitzer.foodinger.model.plan.Plan;
 import com.brennaswitzer.foodinger.model.plan.PlanItem;
 import lombok.val;
@@ -11,9 +12,9 @@ public class PlanFlowTests {
     @Test
     public void somethingSoNeat() {
         val p = new Plan("Week of 3/21");
-        val sat = new PlanItem("Saturday");
+        val sat = PlanItem.section("Saturday");
         p.addChild(sat);
-        val sun = new PlanItem("Sunday");
+        val sun = PlanItem.section("Sunday");
         p.addChild(sun);
         sun.addChild(Quantity.of(3, null), Library.PIZZA);
         val crust = findChildNamed(sun, "Pizza Crust");
@@ -22,13 +23,23 @@ public class PlanFlowTests {
         System.out.println(dumpPlan(p));
     }
 
-    private String dumpPlan(Plan p) {
+    @Test
+    public void andWine() {
+        val p = new Plan("Saturday");
+        p.addChild(Quantity.of(2, null), Library.PIZZA_CRUST);
+        p.addChild(Quantity.of(2, Unit.of("bottles")), Grocery.WINE);
+        p.addChild(Grocery.WINE);
+        p.addChild(PlanItem.adhoc(Grocery.WINE.getName()));
+        System.out.println(dumpPlan(p));
+    }
+
+    private String dumpPlan(PlanItem p) {
         return dumpPlan(p, 0);
     }
 
     private String dumpPlan(PlanItem it, int depth) {
         val sb = new StringBuilder()
-                .append(it.getType().name(), 0, 1)
+                .append(it.getType().getInitial())
                 .append(' ')
                 .append("  ".repeat(depth))
                 .append(it.toLabel())
@@ -41,7 +52,7 @@ public class PlanFlowTests {
     }
 
     private PlanItem findChildNamed(PlanItem root, String name) {
-        if (name.equals(root.getName())) {
+        if (name.equals(root.getRaw())) {
             return root;
         }
         if (root.hasChildren()) {
