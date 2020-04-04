@@ -1,7 +1,5 @@
 package com.brennaswitzer.foodinger.model;
 
-import org.springframework.security.access.AccessDeniedException;
-
 public interface AccessControlled extends Owned {
 
     Acl getAcl();
@@ -22,7 +20,8 @@ public interface AccessControlled extends Owned {
 
     default void ensurePermitted(User user, AccessLevel level) {
         if (! isPermitted(user, level)) {
-            throw new AccessDeniedException("Unauthorized");
+            // todo: throw new org.springframework.security.access.AccessDeniedException("Unauthorized");
+            throw new RuntimeException("Unauthorized");
         }
     }
 
