@@ -1,0 +1,63 @@
+@startuml
+hide footbox
+actor User as U
+participant Client as C
+participant Browser as B
+participant Client as C2
+participant Server as S
+database Database as DB
+participant "Auth Server\n(Google?)" as G
+
+U -> B** : open
+B -> S++ : GET /
+return 200\n<html...
+B -> C**
+C -> S++ : GET /secure/user-info
+return 401
+
+C -> S++ : GET /login-providers
+alt production
+    S -> S++ : spring?
+    return provider[]
+else development
+    S -> DB++ : select * from user
+    return user[]
+    note right of S: build mock 'select\nuser' providers
+    note right of S: build mock 'new\nuser' provider
+end
+return 200\n{providers: [...]}
+deactivate C
+
+C -> U : pick one
+U -> C++ : provider id
+destroy C
+
+alt production
+B -> S++ : POST /login-via?p=id
+    return 302\nLocation: goog/do-oath
+    B -> G : GET /start-oath
+    ... neat user oauth things ...
+    B <- G : 302\nLocation: /oauth-granted?code
+    B -> S+ : GET /oauth-granted?code
+    S -> G : GET /oauth-token?code
+    ... neat server oauth things ...
+    S <- G : 200\n{username: ...}
+    S -> DB++ : ensure user
+    return done!
+    return 302\nLocation: /\nSet-Cookie: JSESSIONID=...
+else development
+    B -> S++ : POST /login-via?p=id
+    opt if new user
+        S -> DB++ : insert into user ...
+        return done!
+    end
+    return 302\nLocation: /\nSet-Cookie: JSESSIONID=...
+end
+
+B -> S++ : GET /
+return 200\n<html...
+B -> C2**
+C2 -> S++ : GET /secure/user-info
+return 200\n{username: ...}
+
+@enduml
