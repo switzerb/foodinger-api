@@ -1,14 +1,15 @@
-spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          github:
-            # FIRST, copy this file to application-default.yml. Don't change this one.
-            #
-            # Then go create a GitHub OAuth app w/
-            #  Homepage URL: http://localhost:8080
-            #  Authorization callback URL: http://localhost:8080/login/oauth2/code/github
-            # and drop your freshly minted id and secret in.
-            clientId: your-client-id
-            clientSecret: your-client-secret
+# FIRST, copy this file to application-default.yml and uncomment the
+# lines below. Don't change this one.
+#
+# Then go create a GitHub OAuth app w/
+#  Homepage URL: http://localhost:8080
+#  Authorization callback URL: http://localhost:8080/login/oauth2/code/github
+# and drop your freshly minted id and secret in.
+#spring:
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          github:
+#            clientId: your-client-id
+#            clientSecret: your-client-secret

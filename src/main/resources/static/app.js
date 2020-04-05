@@ -71,6 +71,17 @@ $(function () {
                     .val(csrfToken);
             $("#main-content").show();
         }, function() {
-            $("#splash").show();
+            $.ajax("/login-providers")
+                .then(function(data) {
+                    var $list = $("#login-provider-list").empty();
+                    if (data.length === 0) {
+                        $list.append('<li>... there are no providers configured?</li>');
+                    }
+                    for (var i = 0; i < data.length; i++) {
+                        var r = data[i];
+                        $list.append('<li><a href="/oauth2/authorization/' + r.id + '">via ' + r.name + '</a></li>')
+                    }
+                    $("#splash").show();
+                })
         });
 });
