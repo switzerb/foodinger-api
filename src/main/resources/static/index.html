@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org"
->
+<html>
 <head>
     <title>Hello WebSocket</title>
     <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -14,12 +13,27 @@
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
     enabled. Please enable
     Javascript and reload this page!</h2></noscript>
-<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
-<form th:action="@{/logout}" method="post">
-    <input type="submit" value="Sign Out"/>
-</form>
-<hr />
-<div id="main-content" class="container">
+<div id="splash" class="container" style="display:none">
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Welcome!</h1>
+
+            <p>Perhaps you want to log in <a href="/oauth2/authorization/github">with GitHub</a>?</p>
+        </div>
+    </div>
+</div>
+<div id="welcome-bar" class="container" style="display:none">
+    <div class="row">
+        <div class="col-md-6">
+            <h1 >Hello <span id="hello"></span>!</h1>
+            <form action="/logout" method="post">
+                <input type="submit" value="Sign Out"/>
+                <input type="hidden" name="_csrf" />
+            </form>
+        </div>
+    </div>
+</div>
+<div id="main-content" class="container" style="display:none">
     <div class="row">
         <div class="col-md-6">
             <form class="form-inline">

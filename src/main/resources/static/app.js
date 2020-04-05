@@ -1,4 +1,5 @@
 var stompClient = null;
+var csrfToken = null;
 
 function setConnected(connected) {
     $("#connect").prop("disabled", connected);
@@ -11,7 +12,9 @@ function connect() {
         var socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
         stompClient.debug = null;
-        stompClient.connect({}, function (frame) {
+        stompClient.connect({
+            "X-CSRF-TOKEN": csrfToken
+        }, function (frame) {
             setConnected(true);
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic/greetings', function (greeting) {
@@ -57,4 +60,17 @@ $(function () {
     $( "#connect" ).click(function() { connect(); });
     $( "#disconnect" ).click(function() { disconnect(); });
     $( "#send" ).click(function() { sendName(); });
+    $.ajax("/user-info")
+        .then(function(data, status, jqXHR) {
+            $("#hello").text(data.name);
+            $("#name").val(data.name);
+            csrfToken = jqXHR.getResponseHeader("X-CSRF-TOKEN")
+            $("#welcome-bar")
+                .show()
+                .find("input[name=_csrf]")
+                    .val(csrfToken);
+            $("#main-content").show();
+        }, function() {
+            $("#splash").show();
+        });
 });

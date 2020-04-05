@@ -1,3 +1,6 @@
-html {
+body {
     background-color: #fff4e6;
+}
+.container .row {
+    background-color: #fff;
 }
