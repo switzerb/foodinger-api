@@ -1,5 +1,6 @@
 package com.brennaswitzer.foodinger.web;
 
+import com.brennaswitzer.foodinger.model.User;
 import com.brennaswitzer.foodinger.security.LoginProviderSource;
 import com.brennaswitzer.foodinger.wire.LoginProvider;
 import com.brennaswitzer.foodinger.wire.UserInfo;
@@ -28,13 +29,18 @@ public class AuthController {
 
     @GetMapping("/user-info")
     public UserInfo userInfo(
-            @AuthenticationPrincipal OAuth2User principal,
+            @AuthenticationPrincipal Object principal,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
         CsrfToken token = csrfTokenRepo.loadToken(request);
         response.addHeader(token.getHeaderName(), token.getToken());
-        return new UserInfo(principal.getAttribute("name"));
+        String name = principal instanceof OAuth2User
+                ? ((OAuth2User) principal).getAttribute("name")
+                : principal instanceof User
+                ? ((User) principal).getUsername()
+                : "";
+        return new UserInfo(name);
     }
 
     @GetMapping("/login-providers")

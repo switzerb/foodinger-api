@@ -82,14 +82,14 @@ $(function () {
                         var n;
                         switch (r.type) {
                             case "oauth":
-                                n = '<a href="/oauth2/authorization/' + r.id + '">via ' + r.name + '</a>';
+                                n = 'via <a href="/oauth2/authorization/' + r.id + '">your ' + r.name + ' account</a>';
                                 break;
                             case "local-user":
-                                n = '<a href="/mock-user/' + r.id + '">as ' + r.name + '</a>';
+                                n = '<form action="/mock-user/login?password=garbage" method="post"><input type="hidden" name="username" value="' + r.id + '" />as <button class="btn-link">' + r.name + '</button></form>';
                                 break;
                             case "new-local-user":
                                 // noinspection HtmlUnknownTarget
-                                n = '<form action="/mock-user" method="post"><input name="username" placeholder="New Username" /> <button>Create</button></form>';
+                                n = '<form action="/mock-user" method="post"><input name="username" placeholder="Username" /> <button>Create</button></form>';
                                 break
                             default:
                                 console.warn("Unknown '%s' provider type", r.type, r);
