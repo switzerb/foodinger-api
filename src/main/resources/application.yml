@@ -1,3 +1,6 @@
+spring:
+  jpa:
+    open-in-view: false
 # FIRST, copy this file to application-default.yml and uncomment the
 # lines below. Don't change this one.
 #
@@ -5,7 +8,6 @@
 #  Homepage URL: http://localhost:8080
 #  Authorization callback URL: http://localhost:8080/login/oauth2/code/github
 # and drop your freshly minted id and secret in.
-#spring:
 #  security:
 #    oauth2:
 #      client:

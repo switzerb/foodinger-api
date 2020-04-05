@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 public class AuthController {
@@ -25,7 +24,7 @@ public class AuthController {
     HttpSessionCsrfTokenRepository csrfTokenRepo;
 
     @Autowired
-    Set<LoginProviderSource> loginProviderSource;
+    List<LoginProviderSource> loginProviderSource;
 
     @GetMapping("/user-info")
     public UserInfo userInfo(
