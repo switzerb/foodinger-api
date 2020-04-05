@@ -7,7 +7,11 @@ import lombok.NonNull;
 public class LoginProvider {
 
     @NonNull
+    private LoginProviderType type;
+
+    @NonNull
     private String id;
+
     @NonNull
     private String name;
 

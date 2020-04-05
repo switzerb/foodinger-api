@@ -79,7 +79,23 @@ $(function () {
                     }
                     for (var i = 0; i < data.length; i++) {
                         var r = data[i];
-                        $list.append('<li><a href="/oauth2/authorization/' + r.id + '">via ' + r.name + '</a></li>')
+                        var n;
+                        switch (r.type) {
+                            case "oauth":
+                                n = '<a href="/oauth2/authorization/' + r.id + '">via ' + r.name + '</a>';
+                                break;
+                            case "local-user":
+                                n = '<a href="/mock/local-user/' + r.id + '">as ' + r.name + '</a>';
+                                break;
+                            case "new-local-user":
+                                // noinspection HtmlUnknownTarget
+                                n = '<form action="/mock/local-user" method="post"><input name="name" placeholder="New User\'s Name" /> <button>Create</button></form>';
+                                break
+                            default:
+                                console.warn("Unknown '%s' provider type", r.type, r);
+                                continue;
+                        }
+                        $list.append($("<li></li>").append(n));
                     }
                     $("#splash").show();
                 })
