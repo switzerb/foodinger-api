@@ -1,8 +1,18 @@
 spring:
+  datasource:
+    # this one was referenced a couple places on the interwebs, including bug
+    # reports against Spring Boot for "undocumented hidden properties". Unclear
+    # if is superseded by the Hikari-specific one below (it's ...undocumented).
+    auto-commit: false
+    hikari:
+      auto-commit: false
   jpa:
     open-in-view: false
-# FIRST, copy this file to application-default.yml and uncomment the
-# lines below. Don't change this one.
+    properties:
+      hibernate:
+        connection:
+          provider_disables_autocommit: true
+# FIRST, copy this hunk to application-default.yml and uncomment it. Don't change it here.
 #
 # Then go create a GitHub OAuth app w/
 #  Homepage URL: http://localhost:8080
