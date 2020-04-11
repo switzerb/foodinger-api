@@ -77,6 +77,7 @@ $(function () {
                     if (data.length === 0) {
                         $list.append('<li>... there are no providers configured?</li>');
                     }
+                    var hasNewUser = false;
                     for (var i = 0; i < data.length; i++) {
                         var r = data[i];
                         var n;
@@ -88,14 +89,17 @@ $(function () {
                                 n = '<form action="/mock-user/login?password=garbage" method="post"><input type="hidden" name="username" value="' + r.id + '" />as <button class="btn-link">' + r.name + '</button></form>';
                                 break;
                             case "new-local-user":
-                                // noinspection HtmlUnknownTarget
-                                n = '<form action="/mock-user" method="post"><input name="username" placeholder="Username" /> <button>Create</button></form>';
-                                break
+                                hasNewUser = true;
+                                continue;
                             default:
                                 console.warn("Unknown '%s' provider type", r.type, r);
                                 continue;
                         }
                         $list.append($("<li></li>").append(n));
+                    }
+                    if (hasNewUser) {
+                        // noinspection HtmlUnknownTarget
+                        $list.after('<form action="/mock-user" method="post">New mock user: <input name="username" placeholder="Username" /> <button>Create</button></form>');
                     }
                     $("#splash").show();
                 })
