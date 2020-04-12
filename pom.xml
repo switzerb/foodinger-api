@@ -156,6 +156,9 @@
                                     <additionalOptions>
                                         <additionalOption>--uml-image-format svg,png</additionalOption>
                                         <additionalOption>--uml-java-bean-properties-as-fields</additionalOption>
+                                        <additionalOption>--create-puml-files</additionalOption>
+                                        <additionalOption>--frames</additionalOption>
+                                        <additionalOption>-html5</additionalOption>
                                     </additionalOptions>
                                 </configuration>
                             </execution>
