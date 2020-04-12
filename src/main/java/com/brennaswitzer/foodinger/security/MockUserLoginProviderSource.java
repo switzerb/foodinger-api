@@ -24,12 +24,12 @@ public class MockUserLoginProviderSource implements LoginProviderSource {
     @Override
     public List<LoginProvider> loginProviders() {
         val providers = new ArrayList<LoginProvider>();
-        for (val u : userRepo.findAll(Sort.by("username"))) {
+        for (val u : userRepo.findAll(Sort.by("name"))) {
             providers.add(
                 new LoginProvider(
                         LoginProviderType.LOCAL_USER,
-                        u.getUsername(),
-                        u.getUsername()));
+                        u.getId().toString(),
+                        u.getName()));
         }
         providers.add(
                 new LoginProvider(

@@ -22,8 +22,11 @@ public class MockUserController {
     public View createUser(
             @RequestParam("username") String username
     ) {
-        val user = new User(username);
-        user.setId(System.currentTimeMillis());
+        val user = new User();
+        user.setProvider("mock");
+        user.setProviderId(username);
+        user.setName(username);
+        user.setEmail(username + "@foodinger.com");
         userService.createUser(user);
         return new RedirectView("/");
     }

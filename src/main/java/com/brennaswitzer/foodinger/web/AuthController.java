@@ -2,12 +2,12 @@ package com.brennaswitzer.foodinger.web;
 
 import com.brennaswitzer.foodinger.model.User;
 import com.brennaswitzer.foodinger.security.LoginProviderSource;
+import com.brennaswitzer.foodinger.security.OAuth2UserInfo;
 import com.brennaswitzer.foodinger.wire.LoginProvider;
 import com.brennaswitzer.foodinger.wire.UserInfo;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,10 +35,10 @@ public class AuthController {
     ) {
         CsrfToken token = csrfTokenRepo.loadToken(request);
         response.addHeader(token.getHeaderName(), token.getToken());
-        String name = principal instanceof OAuth2User
-                ? ((OAuth2User) principal).getAttribute("name")
+        String name = principal instanceof OAuth2UserInfo
+                ? ((OAuth2UserInfo) principal).getName()
                 : principal instanceof User
-                ? ((User) principal).getUsername()
+                ? ((User) principal).getName()
                 : "";
         return new UserInfo(name);
     }

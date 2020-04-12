@@ -26,14 +26,18 @@ public class UpdateDBAuthSuccessHandler implements AuthenticationSuccessHandler 
         val clientRegistrationId = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
         val principal = authentication.getPrincipal();
         if (!(principal instanceof OAuth2UserInfo)) return;
-        String name = ((OAuth2UserInfo) principal).getName();
-        // todo: use the client registration id too
-        var user = repo.findByUsername(name); // todo: use an actual key
-        if (user == null) {
-            user = new User(name);
-            user.setId(System.currentTimeMillis());
-            repo.save(user);
-        } // todo: else update
+        OAuth2UserInfo info = (OAuth2UserInfo) principal;
+        var user = repo.findByProviderAndProviderId(clientRegistrationId, info.getId());
+        boolean isNew = user == null;
+        if (isNew) {
+            user = new User();
+            user.setProvider(clientRegistrationId);
+            user.setProviderId(info.getId());
+        }
+        user.setName(info.getName());
+        user.setEmail(info.getEmail());
+        user.setImageUrl(info.getImageUrl());
+        if (isNew) repo.save(user);
     }
 
 }

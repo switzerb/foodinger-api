@@ -20,12 +20,11 @@ public class MockUserAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication auth) throws AuthenticationException {
-        val username = auth.getName();
-        val user = userRepo.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("No '" + username + "' user is known");
-        }
-        return new MockUserAuthenticationToken(user);
+        val name = auth.getName();
+        val user = userRepo.findById(Long.parseLong(name));
+        return new MockUserAuthenticationToken(user.orElseThrow(() -> {
+            throw new UsernameNotFoundException("No '" + name + "' user is known");
+        }));
     }
 
     @Override
