@@ -20,8 +20,7 @@ public interface AccessControlled extends Owned {
 
     default void ensurePermitted(User user, AccessLevel level) {
         if (! isPermitted(user, level)) {
-            // todo: throw new org.springframework.security.access.AccessDeniedException("Unauthorized");
-            throw new RuntimeException("Unauthorized");
+            throw new org.springframework.security.access.AccessDeniedException("Unauthorized");
         }
     }
 
