@@ -11,7 +11,7 @@ import lombok.ToString;
 @Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Plan extends PlanItem implements AccessControlled {
+public class Plan extends PlanItem implements AccessControlled, TaskList {
 
     private Acl acl;
 
@@ -19,4 +19,13 @@ public class Plan extends PlanItem implements AccessControlled {
         super(name, ItemType.PLAN);
     }
 
+    @Override
+    public void addTask(Task t) {
+        addChild(PlanItem.task(t.getTaskName()));
+    }
+
+    @Override
+    public void addTask(String t) {
+        addChild(PlanItem.task(t));
+    }
 }

@@ -17,10 +17,10 @@ public class PlanFlowTests {
         val sun = PlanItem.section("Sunday");
         p.addChild(sun);
         sun.addChild(Quantity.of(3, null), Library.PIZZA);
-        val crust = findChildNamed(sun, "Pizza Crust");
+        val crust = FTU.findChildNamed(sun, "Pizza Crust");
         assert crust != null;
         sat.addChild(crust);
-        System.out.println(dumpPlan(p));
+        System.out.println(FTU.dumpPlan(p));
     }
 
     @Test
@@ -29,39 +29,8 @@ public class PlanFlowTests {
         p.addChild(Quantity.of(2, null), Library.PIZZA_CRUST);
         p.addChild(Quantity.of(2, Unit.of("bottles")), Grocery.WINE);
         p.addChild(Grocery.WINE);
-        p.addChild(PlanItem.adhoc(Grocery.WINE.getName()));
-        System.out.println(dumpPlan(p));
-    }
-
-    private String dumpPlan(PlanItem p) {
-        return dumpPlan(p, 0);
-    }
-
-    private String dumpPlan(PlanItem it, int depth) {
-        val sb = new StringBuilder()
-                .append(it.getType().getInitial())
-                .append(' ')
-                .append("  ".repeat(depth))
-                .append(it.toLabel())
-                .append('\n');
-        if (it.hasChildren()) {
-            it.getChildren().forEach(i ->
-                    sb.append(dumpPlan(i, depth + 1)));
-        }
-        return sb.toString();
-    }
-
-    private PlanItem findChildNamed(PlanItem root, String name) {
-        if (name.equals(root.getRaw())) {
-            return root;
-        }
-        if (root.hasChildren()) {
-            for (PlanItem it : root.getChildren()) {
-                PlanItem found = findChildNamed(it, name);
-                if (found != null) return found;
-            }
-        }
-        return null;
+        p.addChild(PlanItem.task(Grocery.WINE.getName()));
+        System.out.println(FTU.dumpPlan(p));
     }
 
 }

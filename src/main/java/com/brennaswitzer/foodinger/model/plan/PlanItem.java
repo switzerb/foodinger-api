@@ -13,13 +13,13 @@ import java.util.List;
 @Data
 @ToString(exclude = {"parent", "componentOf"})
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class PlanItem implements Item {
+public class PlanItem implements Item, Task {
 
     public static PlanItem section(String name) {
         return new PlanItem(name, ItemType.SECTION);
     }
 
-    public static PlanItem adhoc(String name) {
+    public static PlanItem task(String name) {
         return new PlanItem(name, ItemType.AD_HOC);
     }
 
@@ -119,4 +119,8 @@ public class PlanItem implements Item {
         return children != null && !children.isEmpty();
     }
 
+    @Override
+    public String getTaskName() {
+        return getRaw();
+    }
 }

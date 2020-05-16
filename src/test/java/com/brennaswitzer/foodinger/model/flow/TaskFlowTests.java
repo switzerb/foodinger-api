@@ -1,19 +1,19 @@
 package com.brennaswitzer.foodinger.model.flow;
 
-import com.brennaswitzer.foodinger.model.task.Task;
-import com.brennaswitzer.foodinger.model.task.TaskList;
-import lombok.val;
+import com.brennaswitzer.foodinger.model.plan.Plan;
+import com.brennaswitzer.foodinger.model.plan.PlanItem;
+import com.brennaswitzer.foodinger.model.plan.TaskList;
 import org.junit.jupiter.api.Test;
 
 public class TaskFlowTests {
 
     @Test
     public void makeSomeTasks() {
-        val tl = new TaskList("Groceries");
-        tl.addTask(new Task("chocolate milk"));
-        tl.addTask(new Task("rice wine vinegar"));
-        tl.addTask(new Task("goat cheese"));
-        System.out.println(tl);
+        TaskList tl = new Plan("Groceries");
+        tl.addTask(PlanItem.task("chocolate milk"));
+        tl.addTask(PlanItem.task("rice wine vinegar"));
+        tl.addTask(PlanItem.task("goat cheese"));
+        System.out.println(FTU.dumpPlan((Plan) tl));
     }
 
 }

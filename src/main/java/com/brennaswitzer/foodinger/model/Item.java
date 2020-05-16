@@ -11,6 +11,10 @@ public interface Item {
     Ingredient getIngredient();
     String getNotes();
 
+    default boolean hasIngredient() {
+        return getIngredient() != null;
+    }
+
     default String toLabel() {
         val ing = getIngredient();
         if (ing == null) return getRaw();
