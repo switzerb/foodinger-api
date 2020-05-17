@@ -95,13 +95,13 @@ public class PlanItem implements Item, Task {
     }
 
     public void addChild(Quantity q, Ingredient r) {
-        addChild(RecipeItem.builder()
-                .raw(q.isExplicit()
-                        ? q.toString() + " " + r.getName()
-                        : r.getName())
-                .quantity(q)
-                .ingredient(r)
-                .build());
+        val ri = new RecipeItem();
+        ri.setRaw(q.isExplicit()
+                ? q.toString() + " " + r.getName()
+                : r.getName());
+        ri.setQuantity(q);
+        ri.setIngredient(r);
+        addChild(ri);
     }
 
     protected PlanItem addChild(Item ri) {
