@@ -15,7 +15,7 @@ public class ShoppingFlowTests {
     @Test
     public void doTheThing() {
         val napalmBoard = new Plan("Groceries");
-        //noinspection UnnecessaryLocalVariable
+        //noinspection UnnecessaryLocalVariable,RedundantCast
         TaskList tl = (TaskList) napalmBoard;
         tl.addTask(PlanItem.task("napalm"));
         tl.addTask(PlanItem.task("goat cheese"));
@@ -32,6 +32,16 @@ public class ShoppingFlowTests {
 
         val sl = new ShoppingList();
         sl.setIncludedPlans(List.of(napalmBoard, p));
+
+        System.out.println(FTU.dumpList(sl));
+        System.out.println("---");
+
+        sl.orderAfter(Grocery.WINE, Grocery.TOMATOES);
+        sl.orderAfter(Grocery.BASIL, Grocery.TOMATOES);
+        sl.orderAfter(Grocery.YEAST, Grocery.FLOUR);
+        sl.orderAfter(Grocery.PEPPERONI, Grocery.BASIL);
+        sl.orderAfter(Grocery.WINE, Grocery.BASIL);
+
         System.out.println(FTU.dumpList(sl));
 
     }

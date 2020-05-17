@@ -9,14 +9,17 @@ import lombok.*;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+// name is unique per owner
 public class Ingredient implements Owned, Labeled {
 
     private User owner;
+    @NonNull
     private String name;
     private boolean deleted;
 
@@ -51,4 +54,19 @@ public class Ingredient implements Owned, Labeled {
     public void clearLabels() {
         labels.clear();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Ingredient)) return false;
+        Ingredient that = (Ingredient) o;
+        return Objects.equals(owner, that.owner) &&
+                name.equals(that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(owner, name);
+    }
+
 }

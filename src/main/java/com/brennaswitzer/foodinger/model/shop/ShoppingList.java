@@ -8,10 +8,8 @@ import com.brennaswitzer.foodinger.model.measure.Quantity;
 import com.brennaswitzer.foodinger.model.plan.ItemType;
 import com.brennaswitzer.foodinger.model.plan.Plan;
 import com.brennaswitzer.foodinger.model.plan.PlanItem;
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
 import lombok.experimental.Delegate;
-import lombok.val;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -30,13 +28,37 @@ public class ShoppingList implements Owned {
         Collection<PlanItem> getComponents();
     }
 
+    @Data
+    @AllArgsConstructor
+    private static class ListItem implements Item {
+
+        @NonNull
+        private String raw;
+        private Quantity quantity;
+        private Ingredient ingredient;
+        private String notes;
+
+    }
+
     private User owner;
 
     private Collection<Plan> includedPlans;
 
-    private List<Ingredient> orderedIngredients;
+    // todo: talk about linear scans....
+    private List<Ingredient> orderedIngredients = new LinkedList<>();
 
-    private Map<PlanItem, Ingredient> adHocOrder;
+    public void orderAfter(Ingredient ing, Ingredient anchor) {
+        orderedIngredients.remove(ing);
+        int i = ensureOrdered(anchor);
+        orderedIngredients.add(i + 1, ing);
+    }
+
+    private int ensureOrdered(Ingredient ing) {
+        int i = orderedIngredients.indexOf(ing);
+        if (i >= 0) return i;
+        orderedIngredients.add(0, ing);
+        return 0;
+    }
 
     public List<SLItem> aggregate() {
         val allGlerg = new LinkedList<PlanItem>();
@@ -55,8 +77,16 @@ public class ShoppingList implements Owned {
         val result = new ArrayList<SLItem>(adHoc.size() + byIngredient.size());
         adHoc.forEach(it ->
                 result.add(new SLItemProxy(it)));
-        byIngredient.forEach((ing, items) ->
-                result.add(new SLItemProxy(ing, items)));
+        byIngredient.forEach((ing, items) -> {
+            ensureOrdered(ing);
+            result.add(new SLItemProxy(ing, items));
+        });
+
+        result.sort((a, b) -> {
+            val ai = orderedIngredients.indexOf(a.getIngredient());
+            val bi = orderedIngredients.indexOf(b.getIngredient());
+            return ai - bi;
+        });
 
         return result;
     }
@@ -72,38 +102,42 @@ public class ShoppingList implements Owned {
             components = null;
         }
 
-        public SLItemProxy(Ingredient ing, PlanItem item) {
-            delegate = item;
-            components = Collections.singletonList(item);
-        }
-
         public SLItemProxy(Ingredient ing, List<PlanItem> items) {
-            val raw = ing.getName() + " (" + items
-                    .stream()
-                    .map(it -> it.getQuantity().toString())
-                    .collect(Collectors.joining(", "))
-                    + ")";
-            delegate = new Item() {
-                @Override
-                public String getRaw() {
-                    return raw;
-                }
-
-                @Override
-                public Quantity getQuantity() {
-                    return null;
-                }
-
-                @Override
-                public Ingredient getIngredient() {
-                    return ing;
-                }
-
-                @Override
-                public String getNotes() {
-                    return "";
-                }
-            };
+            if (items.size() == 1) {
+                delegate = items.get(0);
+                components = items;
+                return;
+            }
+            val firstUnit = Optional.ofNullable(items.get(0))
+                    .map(PlanItem::getQuantity)
+                    .map(Quantity::getUnit);
+            String raw;
+            Quantity q;
+            if (items.stream()
+                    .map(PlanItem::getQuantity)
+                    .map(Quantity::getUnit)
+                    .allMatch(it ->
+                            firstUnit.isEmpty()
+                                    ? it == null
+                                    : firstUnit.get().equals(it))) {
+                // there's a single unit
+                q = Quantity.of(items.stream()
+                        .map(PlanItem::getQuantity)
+                        .map(Quantity::getValue)
+                        .map(Number::doubleValue)
+                        .reduce(0.0, Double::sum),
+                        firstUnit.orElse(null));
+                raw = ing.getName() + " (" + q + ")";
+            } else {
+                q = null; // todo: some sort of aggregate quantity?
+                raw = ing.getName() + " (" + items
+                        .stream()
+                        .filter(it -> it.getQuantity() != null)
+                        .map(it -> it.getQuantity().toString())
+                        .collect(Collectors.joining(", "))
+                        + ")";
+            }
+            delegate = new ListItem(raw, q, ing, null);
             components = items;
         }
 
