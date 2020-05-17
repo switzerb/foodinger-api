@@ -21,7 +21,9 @@ public class Plan extends PlanItem implements AccessControlled, TaskList {
 
     @Override
     public void addTask(Task t) {
-        addChild(PlanItem.task(t.getTaskName()));
+        addChild(t instanceof PlanItem
+                ? (PlanItem) t
+                : PlanItem.task(t.getTaskName()));
     }
 
     @Override

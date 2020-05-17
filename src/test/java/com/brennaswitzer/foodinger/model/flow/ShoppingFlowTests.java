@@ -17,7 +17,8 @@ public class ShoppingFlowTests {
         val napalmBoard = new Plan("Groceries");
         //noinspection UnnecessaryLocalVariable,RedundantCast
         TaskList tl = (TaskList) napalmBoard;
-        tl.addTask(PlanItem.task("napalm"));
+        val napalm = PlanItem.task("napalm");
+        tl.addTask(napalm);
         tl.addTask(PlanItem.task("goat cheese"));
 
         val p = new Plan("Week of 3/21");
@@ -38,9 +39,13 @@ public class ShoppingFlowTests {
 
         sl.orderAfter(Grocery.WINE, Grocery.TOMATOES);
         sl.orderAfter(Grocery.BASIL, Grocery.TOMATOES);
+        sl.orderAfter(napalm, Grocery.FLOUR);
         sl.orderAfter(Grocery.YEAST, Grocery.FLOUR);
         sl.orderAfter(Grocery.PEPPERONI, Grocery.BASIL);
         sl.orderAfter(Grocery.WINE, Grocery.BASIL);
+        sl.getOrderedIngredients()
+                .forEach(System.out::println);
+        System.out.println("---");
 
         System.out.println(FTU.dumpList(sl));
 

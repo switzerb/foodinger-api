@@ -44,47 +44,93 @@ public class ShoppingList implements Owned {
 
     private Collection<Plan> includedPlans;
 
-    // todo: talk about linear scans....
-    private List<Ingredient> orderedIngredients = new LinkedList<>();
+    @Data
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    // todo: leaky access
+    public static class Ordered {
 
-    public void orderAfter(Ingredient ing, Ingredient anchor) {
-        orderedIngredients.remove(ing);
-        int i = ensureOrdered(anchor);
-        orderedIngredients.add(i + 1, ing);
+        static Ordered of(Ingredient ing) {
+            return new Ordered(ing, null);
+        }
+
+        static Ordered of(PlanItem it) {
+            if (it.getIngredient() != null) {
+                throw new IllegalArgumentException("PlanItems w/ an ingredient can't be ordered. Order the ingredient");
+            }
+            return new Ordered(null, it);
+        }
+
+        private Ingredient ingredient;
+        private PlanItem adHocItem;
     }
 
-    private int ensureOrdered(Ingredient ing) {
-        int i = orderedIngredients.indexOf(ing);
+    // todo: talk about linear scans....
+    private List<Ordered> orderedIngredients = new LinkedList<>();
+
+    private void orderAfter(Ordered it, Ordered anchor) {
+        orderedIngredients.remove(it);
+        int i = getOrder(anchor);
+        orderedIngredients.add(i + 1, it);
+    }
+
+    private int getOrder(Ordered it) {
+        int i = orderedIngredients.indexOf(it);
         if (i >= 0) return i;
-        orderedIngredients.add(0, ing);
+        orderedIngredients.add(0, it);
         return 0;
     }
 
-    public List<SLItem> aggregate() {
-        val allGlerg = new LinkedList<PlanItem>();
-        includedPlans.forEach(p ->
-                addItems(allGlerg, p));
+    public void orderAfter(Ingredient ing, Ingredient anchor) {
+        orderAfter(Ordered.of(ing), Ordered.of(anchor));
+    }
 
-        val adHoc = allGlerg
+    public void orderAfter(Ingredient ing, PlanItem anchor) {
+        orderAfter(Ordered.of(ing), Ordered.of(anchor));
+    }
+
+    public void orderAfter(PlanItem it, Ingredient anchor) {
+        orderAfter(Ordered.of(it), Ordered.of(anchor));
+    }
+
+    public void orderAfter(PlanItem it, PlanItem anchor) {
+        orderAfter(Ordered.of(it), Ordered.of(anchor));
+    }
+
+    private int getOrder(Ingredient ing) {
+        return getOrder(Ordered.of(ing));
+    }
+
+    private int getOrder(PlanItem it) {
+        return getOrder(Ordered.of(it));
+    }
+
+    public List<? extends SLItem> aggregate() {
+        val allPlanItems = new LinkedList<PlanItem>();
+        includedPlans.forEach(p ->
+                addItems(allPlanItems, p));
+
+        val adHoc = allPlanItems
                 .stream()
                 .filter(Predicate.not(Item::hasIngredient))
                 .collect(Collectors.toList());
-        val byIngredient = allGlerg
+        val byIngredient = allPlanItems
                 .stream()
                 .filter(Item::hasIngredient)
                 .collect(Collectors.groupingBy(Item::getIngredient));
 
-        val result = new ArrayList<SLItem>(adHoc.size() + byIngredient.size());
+        val result = new ArrayList<SLItemProxy>(adHoc.size() + byIngredient.size());
         adHoc.forEach(it ->
+                // let these get added to the list on demand, so they're first
                 result.add(new SLItemProxy(it)));
         byIngredient.forEach((ing, items) -> {
-            ensureOrdered(ing);
+            getOrder(ing); // get all these in the list ahead of time
             result.add(new SLItemProxy(ing, items));
         });
 
         result.sort((a, b) -> {
-            val ai = orderedIngredients.indexOf(a.getIngredient());
-            val bi = orderedIngredients.indexOf(b.getIngredient());
+            // todo: stinky!
+            val ai = a.isAggregate() ? getOrder(a.getIngredient()) : getOrder((PlanItem) a.delegate);
+            val bi = b.isAggregate() ? getOrder(b.getIngredient()) : getOrder((PlanItem) b.delegate);
             return ai - bi;
         });
 
@@ -122,10 +168,10 @@ public class ShoppingList implements Owned {
                                     : firstUnit.get().equals(it))) {
                 // there's a single unit
                 q = Quantity.of(items.stream()
-                        .map(PlanItem::getQuantity)
-                        .map(Quantity::getValue)
-                        .map(Number::doubleValue)
-                        .reduce(0.0, Double::sum),
+                                .map(PlanItem::getQuantity)
+                                .map(Quantity::getValue)
+                                .map(Number::doubleValue)
+                                .reduce(0.0, Double::sum),
                         firstUnit.orElse(null));
                 raw = ing.getName() + " (" + q + ")";
             } else {
