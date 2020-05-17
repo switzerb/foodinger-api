@@ -14,17 +14,14 @@ import javax.persistence.UniqueConstraint;
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(name = "uk__eqkey", columnNames = "_eqkey"),
         @UniqueConstraint(name = "uk_email", columnNames = "email"),
-        @UniqueConstraint(name = "uk_provider_id", columnNames = {"provider", "providerId"})
+        @UniqueConstraint(name = "uk_provider_id", columnNames = {"provider", "provider_id"})
 })
-// Spring wants `providerId` in the UK def, even though it should be `provider_id`
-// I think it's trying to be clever? But it's violating rules.
-@SuppressWarnings("JpaDataSourceORMInspection")
 public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String provider;
 
-    @Column(nullable = false)
+    @Column(name = "provider_id", nullable = false)
     private String providerId;
 
     @Column(nullable = false)
