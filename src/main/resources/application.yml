@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    # this one was referenced a couple places on the interwebs, including bug
+    # reports against Spring Boot for "undocumented hidden properties". Unclear
+    # if is superseded by the Hikari-specific one below (it's ...undocumented).
+    auto-commit: false
+    hikari:
+      auto-commit: false
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        connection:
+          provider_disables_autocommit: true
+foodinger.public-url: / # where 'index.html' lives from the UA's perspective
+# FIRST, copy this hunk to application-default.yml and uncomment it. Don't change it here.
+#
+# Then go create a GitHub OAuth app w/
+#  Homepage URL: http://localhost:8080
+#  Authorization callback URL: http://localhost:8080/login/oauth2/code/github
+# and drop your freshly minted id and secret in.
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          github:
+#            clientId: your-client-id
+#            clientSecret: your-client-secret
