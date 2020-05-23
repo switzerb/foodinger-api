@@ -26,7 +26,6 @@ public abstract class OAuth2UserInfo implements OAuth2User {
         if (!attributes.containsKey("id")) {
             attributes.put("id", getId());
             attributes.put("name", getName());
-            attributes.put("login", getLogin());
             attributes.put("email", getEmail());
             attributes.put("imageUrl", getImageUrl());
         }
@@ -34,8 +33,6 @@ public abstract class OAuth2UserInfo implements OAuth2User {
     }
 
     public abstract String getId();
-
-    public abstract String getLogin(); // todo: maybe?
 
     public abstract String getName();
 

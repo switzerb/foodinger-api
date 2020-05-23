@@ -1,6 +1,7 @@
 package com.brennaswitzer.foodinger.config;
 
 import com.brennaswitzer.foodinger.security.GitHubOAuth2User;
+import com.brennaswitzer.foodinger.security.GoogleOAuth2User;
 import com.brennaswitzer.foodinger.security.UpdateDBAuthSuccessHandler;
 import com.brennaswitzer.foodinger.util.CompoundAuthenticationSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +66,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .userInfoEndpoint(e -> e
                         .userService(new DelegatingOAuth2UserService<>(List.of(
                             new CustomUserTypesOAuth2UserService(Map.of(
-                                "github", GitHubOAuth2User.class
+                                    "google", GoogleOAuth2User.class,
+                                    "github", GitHubOAuth2User.class
                             ))
                         )))
                     )

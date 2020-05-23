@@ -6,12 +6,13 @@ import lombok.Getter;
 
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class GitHubOAuth2User extends OAuth2UserInfo {
+public class GoogleOAuth2User extends OAuth2UserInfo {
 
+    @JsonProperty("sub")
     private String id;
     private String name;
     private String email;
-    @JsonProperty("avatar_url")
+    @JsonProperty("picture")
     private String imageUrl;
 
 }
