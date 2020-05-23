@@ -1,18 +1,18 @@
 package com.brennaswitzer.foodinger.security;
 
 import com.brennaswitzer.foodinger.model.User;
+import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-import java.util.Collections;
 
 public class MockUserAuthenticationToken extends AbstractAuthenticationToken {
 
-    private final User user;
+    @Getter
+    private final UserPrincipal principal;
 
     public MockUserAuthenticationToken(User user) {
-        super(Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
-        this.user = user;
+        // tis a silly place
+        super(UserPrincipal.of(user).getAuthorities());
+        this.principal = UserPrincipal.of(user);
         setAuthenticated(true);
     }
 
@@ -21,8 +21,4 @@ public class MockUserAuthenticationToken extends AbstractAuthenticationToken {
         return null;
     }
 
-    @Override
-    public Object getPrincipal() {
-        return user;
-    }
 }

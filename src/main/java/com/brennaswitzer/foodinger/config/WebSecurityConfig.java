@@ -2,8 +2,8 @@ package com.brennaswitzer.foodinger.config;
 
 import com.brennaswitzer.foodinger.security.GitHubOAuth2User;
 import com.brennaswitzer.foodinger.security.GoogleOAuth2User;
-import com.brennaswitzer.foodinger.security.UpdateDBAuthSuccessHandler;
-import com.brennaswitzer.foodinger.util.CompoundAuthenticationSuccessHandler;
+import com.brennaswitzer.foodinger.security.LocalUserOAuth2UserService;
+import com.brennaswitzer.foodinger.security.OAuth2UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,12 +14,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.CustomUserTypesOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.DelegatingOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
-import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -33,7 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     ClientRegistrationRepository oauthClientRepo;
 
     @Autowired
-    UpdateDBAuthSuccessHandler updateDBAuthSuccessHandler;
+    LocalUserOAuth2UserService oAuth2UserService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -51,6 +51,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf(c -> c
                 .csrfTokenRepository(csrfTokenRepository())
             )
+            .formLogin().disable()
+            .httpBasic().disable()
             .exceptionHandling(e -> e
                 .authenticationEntryPoint(
                         new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
@@ -64,20 +66,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             http
                 .oauth2Login(o -> o
                     .userInfoEndpoint(e -> e
-                        .userService(new DelegatingOAuth2UserService<>(List.of(
-                            new CustomUserTypesOAuth2UserService(Map.of(
-                                    "google", GoogleOAuth2User.class,
-                                    "github", GitHubOAuth2User.class
-                            ))
-                        )))
-                    )
-                    .successHandler(new CompoundAuthenticationSuccessHandler(List.of(
-                            updateDBAuthSuccessHandler,
-                            new SavedRequestAwareAuthenticationSuccessHandler()
-                    )))
-                );
+                        .userService(oAuth2UserService)));
         }
         // @formatter:on
+    }
+
+    @Bean
+    protected OAuth2UserService<OAuth2UserRequest, OAuth2UserInfo> oAuth2CustomTypesService() {
+        return new OAuth2UserService<>() {
+            private final CustomUserTypesOAuth2UserService delegate = new CustomUserTypesOAuth2UserService(Map.of(
+                    "google", GoogleOAuth2User.class,
+                    "github", GitHubOAuth2User.class
+            ));
+
+            @Override
+            public OAuth2UserInfo loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+                return (OAuth2UserInfo) delegate.loadUser(userRequest);
+            }
+        };
     }
 
     @Bean

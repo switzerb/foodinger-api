@@ -1,14 +1,15 @@
 package com.brennaswitzer.foodinger.web;
 
-import com.brennaswitzer.foodinger.model.User;
+import com.brennaswitzer.foodinger.data.UserRepository;
 import com.brennaswitzer.foodinger.security.LoginProviderSource;
-import com.brennaswitzer.foodinger.security.OAuth2UserInfo;
+import com.brennaswitzer.foodinger.security.UserPrincipal;
 import com.brennaswitzer.foodinger.wire.LoginProvider;
 import com.brennaswitzer.foodinger.wire.UserInfo;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,20 +27,20 @@ public class AuthController {
     @Autowired
     List<LoginProviderSource> loginProviderSource;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping("/api/user-info")
+    @Transactional
     public UserInfo userInfo(
-            @AuthenticationPrincipal Object principal,
+            @AuthenticationPrincipal UserPrincipal principal,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
         val token = csrfTokenRepo.loadToken(request);
         response.addHeader(token.getHeaderName(), token.getToken());
-        val name = principal instanceof OAuth2UserInfo
-                ? ((OAuth2UserInfo) principal).getName()
-                : principal instanceof User
-                ? ((User) principal).getName()
-                : principal.toString();
-        return new UserInfo(name);
+        return UserInfo.of(userRepository.getOne(principal.getId()))
+                .withPrincipal(principal);
     }
 
     @GetMapping("/login-providers")
