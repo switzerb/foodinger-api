@@ -28,18 +28,29 @@ public class LocalUserOAuth2UserService implements OAuth2UserService<OAuth2UserR
         val info = delegate.loadUser(userRequest);
         if (info == null) return null;
         val clientRegistrationId = userRequest.getClientRegistration().getRegistrationId();
-        var user = userRepo.findByProviderAndProviderId(clientRegistrationId, info.getId());
-        boolean isNew = user == null;
-        if (isNew) {
-            user = new User();
-            user.setProvider(clientRegistrationId);
-            user.setProviderId(info.getId());
-        }
+        val optUser = userRepo.findByProviderAndProviderId(clientRegistrationId, info.getId());
+        return UserPrincipal.of(optUser
+                .map(u -> updateUser(u, info))
+                .orElseGet(() -> createUser(clientRegistrationId, info)));
+    }
+
+    private User updateUser(User user, OAuth2UserInfo info) {
         user.setName(info.getName());
-        user.setEmail(info.getEmail());
         user.setImageUrl(info.getImageUrl());
-        if (isNew) userRepo.save(user);
-        return UserPrincipal.of(user);
+        return user;
+    }
+
+    private User createUser(String clientRegistrationId, OAuth2UserInfo info) {
+        if (userRepo.findByEmail(info.getEmail()).isPresent()) {
+            throw new NoFederationAuthException(clientRegistrationId, info.getEmail());
+        }
+        val user = new User();
+        user.setProvider(clientRegistrationId);
+        user.setProviderId(info.getId());
+        user.setEmail(info.getEmail());
+        user.setName(info.getName());
+        user.setImageUrl(info.getImageUrl());
+        return userRepo.save(user);
     }
 
 }
