@@ -11,10 +11,13 @@ import java.time.Instant;
 @Getter
 @Setter
 @MappedSuperclass
+@SequenceGenerator(name = "id_seq",
+        sequenceName = "id_seq")
 public abstract class BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+            generator = "id_seq")
     private Long id;
 
     @NotNull
@@ -30,8 +33,7 @@ public abstract class BaseEntity {
 
     @PrePersist
     protected void onPersist() {
-        Instant now = Instant.now();
-        setCreatedAt(now);
+        setCreatedAt(Instant.now());
     }
 
     /**
@@ -48,14 +50,14 @@ public abstract class BaseEntity {
      * @return Whether the passed object is equal to this one
      */
     @Override
-    public boolean equals(Object object) {
+    public final boolean equals(Object object) {
         if (object == null) return false;
         if (!getClass().isAssignableFrom(object.getClass())) return false;
         return this.get_eqkey().equals(((BaseEntity) object).get_eqkey());
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return this.get_eqkey().hashCode();
     }
 

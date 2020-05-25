@@ -12,9 +12,9 @@ import javax.persistence.UniqueConstraint;
 @Setter
 @Entity
 @Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(name = "uk__eqkey", columnNames = "_eqkey"),
-        @UniqueConstraint(name = "uk_email", columnNames = "email"),
-        @UniqueConstraint(name = "uk_provider_id", columnNames = {"provider", "provider_id"})
+        @UniqueConstraint(name = "uk_users__eqkey", columnNames = "_eqkey"),
+        @UniqueConstraint(name = "uk_users_email", columnNames = "email"),
+        @UniqueConstraint(name = "uk_users_provider_id", columnNames = {"provider", "provider_id"})
 })
 public class User extends BaseEntity {
 
